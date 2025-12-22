@@ -1,0 +1,53 @@
+.page-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #fff;
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 20px;
+}
+
+.music-card {
+    background: #1a1a1a;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid #333;
+    transition: 0.3s;
+}
+
+.music-card:hover {
+    transform: translateY(-4px);
+    border-color: #ff0066;
+}
+
+.music-title {
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: #ff0066;
+}
+
+.music-category {
+    color: #b3b3b3;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.music-text {
+    margin-bottom: 12px;
+    line-height: 1.5;
+    color: #e6e6e6;
+}
+
+.music-date {
+    font-size: 12px;
+    color: #808080;
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 25px;
+}
