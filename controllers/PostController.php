@@ -1,4 +1,5 @@
 <?php
+
 namespace app\controllers;
 
 use yii\web\Controller;
@@ -13,18 +14,27 @@ class PostController extends Controller
 {
     public function actionIndex()
     {
-        // get only published posts
-        $query = Post::find()
-            ->where(['published' => 1])
-            ->with('category');
+        $q = trim(Yii::$app->request->get('q', ''));
 
-        // pagination settings
+        $query = Post::find()
+            ->where(['posts.published' => 1])
+            ->joinWith(['category', 'tags']);
+
+        if ($q !== '') {
+            $query->andWhere([
+                'or',
+                ['like', 'posts.title', $q],
+                ['like', 'posts.content', $q],
+                ['like', 'category.name', $q],
+                ['like', 'tags.name', $q],
+            ])->distinct();
+        }
+
         $pagination = new Pagination([
             'defaultPageSize' => 6,
             'totalCount' => $query->count(),
         ]);
 
-        // posts list
         $posts = $query
             ->orderBy(['published_at' => SORT_DESC])
             ->offset($pagination->offset)
@@ -34,75 +44,10 @@ class PostController extends Controller
         return $this->render('index', [
             'posts' => $posts,
             'pagination' => $pagination,
+            'q' => $q,
         ]);
     }
-
-        public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'only' => ['create','update','delete','admin-index'],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'], 
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    public function actionCreate()
-    {
-        $model = new Post();
-
-        if ($model->load(Yii::$app->request->post())) {
-            // handle uploaded file
-            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
-
-            if ($model->validate() && $model->uploadImage() && $model->save(false)) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        return $this->render('create', ['model' => $model]);
-    }
-
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        $oldImage = $model->image;
-
-        if ($model->load(Yii::$app->request->post())) {
-            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
-
-            if ($model->validate()) {
-                if ($model->imageFile) {
-                    // uploadImage deletes old image itself
-                    $model->uploadImage();
-                } else {
-                    // keep old image
-                    $model->image = $oldImage;
-                }
-                $model->save();
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        }
-
-        return $this->render('update', ['model' => $model]);
-    }
-
-    public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-        // remove image file
-        $model->removeImageFile();
-        $model->delete();
-        return $this->redirect(['index']);
-    }
-
+    
     protected function findModel($id)
     {
         if (($m = Post::findOne($id)) !== null) {

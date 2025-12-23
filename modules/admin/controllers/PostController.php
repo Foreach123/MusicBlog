@@ -72,6 +72,7 @@ class PostController extends Controller
             $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
 
             if ($model->validate() && $model->uploadImage() && $model->save(false)) {
+                $model->syncTagsFromInput();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }
@@ -82,7 +83,7 @@ class PostController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+        $model->loadTagsToInput();
         $oldImage = $model->image;
 
         if ($model->load(Yii::$app->request->post())) {
@@ -96,7 +97,8 @@ class PostController extends Controller
                     // keep old image
                     $model->image = $oldImage;
                 }
-                $model->save();
+                $model->save(false);
+                $model->syncTagsFromInput();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }

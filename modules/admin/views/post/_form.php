@@ -19,6 +19,9 @@ use app\models\Category;
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'content')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'tagsInput')
+    ->textInput(['placeholder' => 'pop, rap, electronic'])
+    ->hint('Вводь теги через кому') ?>
 
     <?= $form->field($model, 'category_id')->dropDownList(
         ArrayHelper::map(Category::find()->all(), 'id', 'name'),

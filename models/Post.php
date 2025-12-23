@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use yii\db\ActiveRecord;
@@ -9,6 +10,7 @@ class Post extends ActiveRecord
 {
     /** @var UploadedFile|null */
     public $imageFile;
+    public $tagsInput;
 
     // db table
     public static function tableName()
@@ -25,18 +27,20 @@ class Post extends ActiveRecord
     public function rules()
     {
         return [
-            [['title','content'], 'required'],
-            [['category_id','published'], 'integer'],
+            [['title', 'content'], 'required'],
+            [['category_id', 'published'], 'integer'],
             [['content'], 'string'],
             [['title'], 'string', 'max' => 255],
             [['image'], 'string', 'max' => 255],
             // validation for upload
-            [['imageFile'], 'file',
-    'extensions' => 'png, jpg, jpeg, gif',
-    'checkExtensionByMimeType' => false,
-    'maxSize' => 1024 * 1024 * 5,
-],
-
+            [
+                ['imageFile'],
+                'file',
+                'extensions' => 'png, jpg, jpeg, gif',
+                'checkExtensionByMimeType' => false,
+                'maxSize' => 1024 * 1024 * 5,
+            ],
+            [['tagsInput'], 'safe'],
         ];
     }
 
@@ -44,7 +48,9 @@ class Post extends ActiveRecord
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels() ?? [], [
-            'imageFile' => 'Image'
+            'imageFile' => 'Image',
+            'tagsInput' => 'Tags (comma separated)'
+
         ]);
     }
 
@@ -88,5 +94,60 @@ class Post extends ActiveRecord
                 @unlink($path);
             }
         }
+    }
+
+    public function getPostTags()
+    {
+        return $this->hasMany(PostTag::class, ['post_id' => 'id']);
+    }
+
+    public function getTags()
+    {
+        return $this->hasMany(Tags::class, ['id' => 'tag_id'])
+            ->via('postTags');
+    }
+
+    public function syncTagsFromInput(): void
+    {
+        $raw = (string)$this->tagsInput;
+        $names = array_filter(array_map('trim', preg_split('/[,;]+/', $raw)));
+
+        // delete old links
+        PostTag::deleteAll(['post_id' => $this->id]);
+
+        if (!$names) return;
+
+        $tagIds = [];
+        foreach ($names as $name) {
+            $tag = Tags::findOne(['name' => $name]);
+            if (!$tag) {
+                $tag = new Tags();
+                $tag->name = $name;
+                $tag->slug = $this->slugify($name);
+                $tag->save(false);
+            }
+            $tagIds[] = $tag->id;
+        }
+
+        // insert new links
+        foreach (array_unique($tagIds) as $tagId) {
+            $link = new PostTag();
+            $link->post_id = $this->id;
+            $link->tag_id = $tagId;
+            $link->save(false);
+        }
+    }
+
+    private function slugify(string $text): string
+    {
+        $text = mb_strtolower(trim($text));
+        $text = preg_replace('/[^a-z0-9а-яіїєґ]+/iu', '-', $text);
+        $text = trim($text, '-');
+        return $text ?: uniqid('tag_');
+    }
+
+    public function loadTagsToInput(): void
+    {
+        $this->tagsInput = implode(', ', array_map(fn($t) => $t->name, $this->tags));
     }
 }
