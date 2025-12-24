@@ -9,6 +9,8 @@ use Yii;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
+use yii\db\Query;
+use yii\db\Expression;
 
 class PostController extends Controller
 {
@@ -23,20 +25,42 @@ class PostController extends Controller
 
     public function actionIndex()
     {
-        // get only published posts
-        $query = Post::find()
-            ->where(['published' => 1])
-            ->with('category');
+        $q = trim(Yii::$app->request->get('q', ''));
 
-        // pagination settings
+        $query = Post::find()
+            ->alias('p')
+            ->where(['p.published' => 1])
+            ->joinWith(['category c']); 
+
+        if ($q !== '') {
+            $tokens = preg_split('/\s+/', $q, -1, PREG_SPLIT_NO_EMPTY);
+
+            foreach ($tokens as $t) {
+
+                
+                $tagExists = (new Query())
+                    ->from(['pt' => 'post_tag'])
+                    ->innerJoin(['tg' => 'tags'], 'tg.id = pt.tag_id')
+                    ->where(new Expression('pt.post_id = p.id'))
+                    ->andWhere(['like', 'tg.name', $t]);
+
+                $query->andWhere([
+                    'or',
+                    ['like', 'p.title', $t],
+                    ['like', 'p.content', $t],
+                    ['like', 'c.name', $t],
+                    ['exists', $tagExists],
+                ]);
+            }
+        }
+
         $pagination = new Pagination([
             'defaultPageSize' => 6,
             'totalCount' => $query->count(),
         ]);
 
-        // posts list
         $posts = $query
-            ->orderBy(['published_at' => SORT_DESC])
+            ->orderBy(['p.published_at' => SORT_DESC])
             ->offset($pagination->offset)
             ->limit($pagination->limit)
             ->all();
@@ -44,6 +68,7 @@ class PostController extends Controller
         return $this->render('index', [
             'posts' => $posts,
             'pagination' => $pagination,
+            'q' => $q,
         ]);
     }
 

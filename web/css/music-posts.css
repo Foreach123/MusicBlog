@@ -51,3 +51,198 @@
     text-align: center;
     margin-top: 25px;
 }
+
+.posts-toolbar {
+    margin: 10px 0 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-input {
+    width: 420px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #333;
+}
+
+.search-btn {
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.search-reset {
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.music-cover {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 12px;
+}
+
+.music-cover.placeholder {
+    background: #222;
+    border: 1px dashed #444;
+}
+
+html, body {
+  background: #0b0f14 !important;
+  color: #eaeaea;
+}
+
+.wrap, .container, .container-fluid, main, .content {
+  background: transparent !important;
+}
+
+.site-index, .site-about, .site-contact {
+  background: transparent !important;
+}
+
+body{
+  background:
+    radial-gradient(1100px 600px at 50% -10%, rgba(255,0,102,.14), transparent 60%),
+    radial-gradient(900px 600px at 10% 0%, rgba(72,141,255,.10), transparent 55%),
+    #0b0f14 !important;
+}
+
+/*cards*/
+.music-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.music-card::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background: radial-gradient(420px 200px at 20% 0%, rgba(255,0,102,.12), transparent 60%);
+  opacity:0;
+  transition:.25s;
+  pointer-events:none;
+}
+.music-card:hover::before{ opacity:1; }
+.music-card:hover{
+  transform: translateY(-6px);
+  border-color: rgba(255,0,102,.45);
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+}
+
+/*title/text*/
+.music-title{
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #ff2d87;
+}
+.music-category{ color: rgba(255,255,255,.65); }
+.music-date{ color: rgba(255,255,255,.45); }
+
+/*tags chips*/
+.music-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin: 10px 0 12px;
+}
+.music-tags .tag{
+  display:inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  text-decoration:none;
+  font-size: 12px;
+  color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,0,102,.30);
+  background: rgba(255,0,102,.10);
+  transition:.2s;
+}
+.music-tags .tag:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,0,102,.55);
+  background: rgba(255,0,102,.16);
+}
+
+/*cover*/
+.music-cover{
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 16px;
+}
+
+/*search bar capsule*/
+.posts-toolbar{ padding: 0 12px; }
+
+.search-form{
+  width: min(780px, 100%);
+  padding: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.search-input{
+  background: transparent;
+  color: #fff;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+.search-input::placeholder{ color: rgba(255,255,255,.35); }
+
+.search-btn{
+  border-radius: 999px;
+  border: 1px solid rgba(255,0,102,.35);
+  background: linear-gradient(135deg, rgba(255,0,102,.18), rgba(255,255,255,.02));
+  color: #fff;
+  font-weight: 700;
+  transition: .2s;
+}
+.search-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,0,102,.6);
+  box-shadow: 0 12px 30px rgba(255,0,102,.12);
+}
+
+.search-reset{
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.70);
+}
+.search-reset:hover{
+  color:#fff;
+  border-color: rgba(255,255,255,.22);
+}
+
+/*pagination*/
+.pagination a, .pagination span{
+  display:inline-block;
+  margin: 0 4px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  text-decoration:none;
+  color: rgba(255,255,255,.72);
+  transition:.18s;
+}
+.pagination a:hover{
+  color:#fff;
+  border-color: rgba(255,0,102,.40);
+}
+.pagination .active a, .pagination .active span{
+  border-color: rgba(255,0,102,.55);
+  color:#fff;
+}
