@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\ActiveForm;
 
 /** @var app\models\Post $model */
 
@@ -40,23 +41,45 @@ $this->registerCssFile('@web/css/music-posts.css');
 </article>
 
 <!-- COMMENTS -->
-<section class="comments">
+<section class="comments" id="comments">
 
     <h2 class="comments-title">Comments</h2>
 
-    <div class="comment">
-        <div class="comment-author">Alex</div>
-        <div class="comment-text">Great article, very interesting!</div>
-    </div>
+    <?php if (Yii::$app->user->isGuest): ?>
+        <p class="comments-note">Please log in to leave a comment.</p>
+    <?php else: ?>
+        <div class="comment-form">
+            <?php $form = ActiveForm::begin([
+                'action' => ['post/add-comment', 'id' => $model->id],
+                'method' => 'post',
+            ]); ?>
 
-    <div class="comment">
-        <div class="comment-author">Maria</div>
-        <div class="comment-text">I like this music trend.</div>
-    </div>
+            <?= $form->field($newComment, 'content')
+                ->textarea(['rows' => 3, 'placeholder' => 'Write a comment...'])
+                ->label(false) ?>
 
-    <div class="comment">
-        <div class="comment-author">John</div>
-        <div class="comment-text">Nice overview 👍</div>
-    </div>
+            <div class="comment-form-actions">
+                <?= Html::submitButton('Send', ['class' => 'search-btn']) ?>
+            </div>
+
+            <?php ActiveForm::end(); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($model->comments)): ?>
+        <?php foreach ($model->comments as $c): ?>
+            <div class="comment">
+                <div class="comment-author">
+                    <?= Html::encode($c->user->name ?? $c->user->email ?? 'User') ?>
+                    <span class="comment-date">
+                        <?= Yii::$app->formatter->asDatetime($c->created_at) ?>
+                    </span>
+                </div>
+                <div class="comment-text"><?= nl2br(Html::encode($c->content)) ?></div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p class="comments-note">No comments yet.</p>
+    <?php endif; ?>
 
 </section>

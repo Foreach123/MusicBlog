@@ -11,14 +11,18 @@ use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\db\Query;
 use yii\db\Expression;
+use app\models\Comment;
+use yii\web\Response;
 
 class PostController extends Controller
 {
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $newComment = new Comment();
         return $this->render('view', [
             'model' => $model,
+            'newComment' => $newComment,
         ]);
     }
 
@@ -30,14 +34,14 @@ class PostController extends Controller
         $query = Post::find()
             ->alias('p')
             ->where(['p.published' => 1])
-            ->joinWith(['category c']); 
+            ->joinWith(['category c']);
 
         if ($q !== '') {
             $tokens = preg_split('/\s+/', $q, -1, PREG_SPLIT_NO_EMPTY);
 
             foreach ($tokens as $t) {
 
-                
+
                 $tagExists = (new Query())
                     ->from(['pt' => 'post_tag'])
                     ->innerJoin(['tg' => 'tags'], 'tg.id = pt.tag_id')
@@ -77,11 +81,11 @@ class PostController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['create', 'update', 'delete', 'admin-index'],
+                'only' => ['add-comment'],
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['@'], // only logged in
                     ],
                 ],
             ],
@@ -142,9 +146,43 @@ class PostController extends Controller
 
     protected function findModel($id)
     {
-        if (($m = Post::findOne($id)) !== null) {
+        $m = Post::find()
+            ->where(['id' => $id, 'published' => 1])
+            ->with(['category', 'tags', 'comments.user', 'comments.replies.user'])
+            ->one();
+
+        if ($m !== null) {
             return $m;
         }
+
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+
+    public function actionAddComment($id)
+    {
+        $post = Post::find()->where(['id' => $id, 'published' => 1])->one();
+        if (!$post) {
+            throw new NotFoundHttpException('Post not found.');
+        }
+
+        $comment = new Comment();
+        $comment->post_id = (int)$id;
+        $comment->user_id = (int)Yii::$app->user->id;
+        $comment->status = 1;
+
+        $parentId = Yii::$app->request->post('parent_id');
+        $comment->parent_id = $parentId !== null && $parentId !== '' ? (int)$parentId : null;
+
+        if ($comment->load(Yii::$app->request->post()) && $comment->save()) {
+            return $this->redirect(['post/view', 'id' => $id, '#' => 'comments']);
+        }
+
+        $model = $this->findModel($id);
+
+        return $this->render('view', [
+            'model' => $model,
+            'newComment' => $comment,
+        ]);
     }
 }

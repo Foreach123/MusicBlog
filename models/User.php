@@ -67,8 +67,13 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     // checking user role
-    public function isAdmin(): bool 
+    public function isAdmin(): bool
     {
         return isset($this->role) && $this->role === 'admin';
+    }
+
+    public function getComments()
+    {
+        return $this->hasMany(Comment::class, ['user_id' => 'id']);
     }
 }

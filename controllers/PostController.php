@@ -9,16 +9,38 @@ use Yii;
 use yii\web\NotFoundHttpException;
 use yii\db\Query;
 use yii\db\Expression;
+use app\models\Comment;
+use yii\filters\AccessControl;
+
 
 class PostController extends Controller
 {
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $newComment = new Comment();
         return $this->render('view', [
             'model' => $model,
+            'newComment' => $newComment,
         ]);
     }
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['add-comment'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // only logged in
+                    ],
+                ],
+            ],
+        ];
+    }
+
 
     public function actionIndex()
     {
@@ -71,9 +93,43 @@ class PostController extends Controller
 
     protected function findModel($id)
     {
-        if (($m = Post::findOne($id)) !== null) {
+        $m = Post::find()
+            ->where(['id' => $id, 'published' => 1])
+            ->with(['category', 'tags', 'comments.user', 'comments.replies.user'])
+            ->one();
+
+        if ($m !== null) {
             return $m;
         }
+
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+
+    public function actionAddComment($id)
+    {
+        $post = Post::find()->where(['id' => $id, 'published' => 1])->one();
+        if (!$post) {
+            throw new NotFoundHttpException('Post not found.');
+        }
+
+        $comment = new Comment();
+        $comment->post_id = (int)$id;
+        $comment->user_id = (int)Yii::$app->user->id;
+        $comment->status = 1;
+
+        $parentId = Yii::$app->request->post('parent_id');
+        $comment->parent_id = $parentId !== null && $parentId !== '' ? (int)$parentId : null;
+
+        if ($comment->load(Yii::$app->request->post()) && $comment->save()) {
+            return $this->redirect(['post/view', 'id' => $id, '#' => 'comments']);
+        }
+
+        $model = $this->findModel($id);
+
+        return $this->render('view', [
+            'model' => $model,
+            'newComment' => $comment,
+        ]);
     }
 }
