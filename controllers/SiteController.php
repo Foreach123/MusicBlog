@@ -123,4 +123,10 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    public function actionError()
+    {
+        $exception = \Yii::$app->errorHandler->exception;
+        return $this->render('error', ['exception' => $exception]);
+    }
 }

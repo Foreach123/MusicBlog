@@ -12,21 +12,29 @@ use yii\db\Expression;
 
 class PostController extends Controller
 {
-        public function actionIndex()
+    public function actionView($id)
+    {
+        $model = $this->findModel($id);
+        return $this->render('view', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionIndex()
     {
         $q = trim(Yii::$app->request->get('q', ''));
 
         $query = Post::find()
             ->alias('p')
             ->where(['p.published' => 1])
-            ->joinWith(['category c']); 
+            ->joinWith(['category c']);
 
         if ($q !== '') {
             $tokens = preg_split('/\s+/', $q, -1, PREG_SPLIT_NO_EMPTY);
 
             foreach ($tokens as $t) {
 
-                
+
                 $tagExists = (new Query())
                     ->from(['pt' => 'post_tag'])
                     ->innerJoin(['tg' => 'tags'], 'tg.id = pt.tag_id')

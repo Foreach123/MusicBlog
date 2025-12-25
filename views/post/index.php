@@ -7,8 +7,6 @@ use yii\helpers\Url;
 $this->registerCssFile('@web/css/music-posts.css'); // CSS
 ?>
 
-<h1 class="page-title">Smart music</h1>
-
 <div class="posts-toolbar">
     <?= Html::beginForm(['post/index'], 'get', ['class' => 'search-form']) ?>
     <?= Html::textInput('q', $q ?? '', [
@@ -27,12 +25,25 @@ $this->registerCssFile('@web/css/music-posts.css'); // CSS
     <?php foreach ($posts as $post): ?>
         <div class="music-card">
             <?php if (!empty($post->image)): ?>
-                <img class="music-cover" src="<?= Yii::getAlias('@web') . '/uploads/' . $post->image ?>" alt="cover">
+                <a href="<?= Url::to(['post/view', 'id' => $post->id]) ?>">
+                    <?php if (!empty($post->image)): ?>
+                        <img class="music-cover"
+                            src="/uploads/<?= Html::encode($post->image) ?>"
+                            alt="<?= Html::encode($post->title) ?>">
+                    <?php else: ?>
+                        <div class="music-cover placeholder"></div>
+                    <?php endif; ?>
+                </a>
+
             <?php else: ?>
                 <div class="music-cover placeholder"></div>
             <?php endif; ?>
 
-            <h2 class="music-title"><?= Html::encode($post->title) ?></h2>
+            <h2 class="music-title">
+                <a href="<?= Url::to(['post/view', 'id' => $post->id]) ?>">
+                    <?= Html::encode($post->title) ?>
+                </a>
+            </h2>
 
             <p class="music-category">
                 Category:
@@ -51,8 +62,6 @@ $this->registerCssFile('@web/css/music-posts.css'); // CSS
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-
-
             <p class="music-date">
                 Published: <?= $post->published_at ?>
             </p>

@@ -1,42 +1,61 @@
 <?php
-
 use yii\helpers\Html;
-use yii\widgets\DetailView;
+use yii\helpers\Url;
 
-/** @var yii\web\View $this */
 /** @var app\models\Post $model */
 
-$this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Posts', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
+$this->registerCssFile('@web/css/post-view.css');
 ?>
-<div class="post-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<article class="post-view">
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
+    <?php if ($model->image): ?>
+        <div class="post-hero">
+            <img src="/uploads/<?= Html::encode($model->image) ?>" alt="<?= Html::encode($model->title) ?>">
+        </div>
+    <?php endif; ?>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'title',
-            'content:ntext',
-            'category_id',
-            'published',
-            'published_at',
-            'image',
-        ],
-    ]) ?>
+    <h1 class="post-title"><?= Html::encode($model->title) ?></h1>
 
-</div>
+    <div class="post-meta">
+        <span>Category: <?= Html::encode($model->category->name ?? '—') ?></span>
+        <span>Published: <?= Yii::$app->formatter->asDate($model->published_at) ?></span>
+    </div>
+
+    <?php if ($model->tags): ?>
+        <div class="post-tags">
+            <?php foreach ($model->tags as $tag): ?>
+                <a href="<?= Url::to(['post/index', 'q' => $tag->name]) ?>" class="tag">
+                    #<?= Html::encode($tag->name) ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="post-content">
+        <?= nl2br(Html::encode($model->content)) ?>
+    </div>
+
+</article>
+
+<!-- COMMENTS -->
+<section class="comments">
+
+    <h2 class="comments-title">Comments</h2>
+
+    <div class="comment">
+        <div class="comment-author">Alex</div>
+        <div class="comment-text">Great article, very interesting!</div>
+    </div>
+
+    <div class="comment">
+        <div class="comment-author">Maria</div>
+        <div class="comment-text">I like this music trend.</div>
+    </div>
+
+    <div class="comment">
+        <div class="comment-author">John</div>
+        <div class="comment-text">Nice overview 👍</div>
+    </div>
+
+</section>
