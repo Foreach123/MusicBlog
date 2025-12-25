@@ -91,32 +91,61 @@
     text-decoration: underline;
 }
 
-.comments-note{
-  color: rgba(255,255,255,.55);
-  font-size: 13px;
+.comments-note {
+    color: rgba(255, 255, 255, .55);
+    font-size: 13px;
 }
 
-.comment-form{
-  margin: 12px 0 18px;
+.comment-form {
+    margin: 12px 0 18px;
 }
 
-.comment-form textarea{
-  width: 100%;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 12px;
-  padding: 12px;
-  color: rgba(255,255,255,.88);
-  resize: vertical;
+.comment-form textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .10);
+    border-radius: 12px;
+    padding: 12px;
+    color: rgba(255, 255, 255, .88);
+    resize: vertical;
 }
 
-.comment-form-actions{
-  margin-top: 10px;
+.comment-form-actions {
+    margin-top: 10px;
 }
 
-.comment-date{
-  margin-left: 10px;
-  font-size: 12px;
-  color: rgba(255,255,255,.45);
-  font-weight: 400;
+.comment-date {
+    margin-left: 10px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, .45);
+    font-weight: 400;
+}
+
+.reply-btn {
+    margin-top: 8px;
+    background: transparent;
+    border: 0;
+    color: rgba(255, 45, 135, .9);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+}
+
+.reply-btn:hover {
+    text-decoration: underline;
+}
+
+.reply-form {
+    margin-top: 10px;
+}
+
+.replies {
+    margin-top: 12px;
+    margin-left: 18px;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, .10);
+}
+
+.comment.reply {
+    padding: 10px 0;
 }

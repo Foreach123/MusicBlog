@@ -153,8 +153,11 @@ class Post extends ActiveRecord
 
     public function getComments()
     {
-        return $this->hasMany(\app\models\Comment::class, ['post_id' => 'id'])
-            ->andWhere(['status' => 1, 'parent_id' => null])
-            ->orderBy(['created_at' => SORT_DESC]);
+        return $this->hasMany(Comment::class, ['post_id' => 'id'])
+            ->andWhere([
+                'status' => 1,
+                'parent_id' => null,
+            ])
+            ->orderBy(['created_at' => SORT_ASC]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -40,6 +41,7 @@ $this->registerCssFile('@web/css/post-view.css');
 </article>
 
 <!-- COMMENTS -->
+<!-- COMMENTS -->
 <section class="comments" id="comments">
 
     <h2 class="comments-title">Comments</h2>
@@ -52,6 +54,8 @@ $this->registerCssFile('@web/css/post-view.css');
                 'action' => ['post/add-comment', 'id' => $model->id],
                 'method' => 'post',
             ]); ?>
+
+            <?= Html::hiddenInput('parent_id', '') ?>
 
             <?= $form->field($newComment, 'content')
                 ->textarea(['rows' => 3, 'placeholder' => 'Write a comment...'])
@@ -68,13 +72,55 @@ $this->registerCssFile('@web/css/post-view.css');
     <?php if (!empty($model->comments)): ?>
         <?php foreach ($model->comments as $c): ?>
             <div class="comment">
+
                 <div class="comment-author">
                     <?= Html::encode($c->user->name ?? $c->user->email ?? 'User') ?>
                     <span class="comment-date">
                         <?= Yii::$app->formatter->asDatetime($c->created_at) ?>
                     </span>
                 </div>
+
                 <div class="comment-text"><?= nl2br(Html::encode($c->content)) ?></div>
+
+                <?php if (!Yii::$app->user->isGuest): ?>
+                    <button class="reply-btn" type="button" data-reply="<?= (int)$c->id ?>">Reply</button>
+
+                    <div class="reply-form" id="reply-form-<?= (int)$c->id ?>" style="display:none;">
+                        <?php $form2 = ActiveForm::begin([
+                            'action' => ['post/add-comment', 'id' => $model->id],
+                            'method' => 'post',
+                        ]); ?>
+
+                        <?= Html::hiddenInput('parent_id', (int)$c->id) ?>
+
+                        <?= $form2->field($newComment, 'content')
+                            ->textarea(['rows' => 2, 'placeholder' => 'Write a reply...'])
+                            ->label(false) ?>
+
+                        <div class="comment-form-actions">
+                            <?= Html::submitButton('Send', ['class' => 'search-btn']) ?>
+                        </div>
+
+                        <?php ActiveForm::end(); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($c->replies)): ?>
+                    <div class="replies">
+                        <?php foreach ($c->replies as $r): ?>
+                            <div class="comment reply">
+                                <div class="comment-author">
+                                    <?= Html::encode($r->user->name ?? $r->user->email ?? 'User') ?>
+                                    <span class="comment-date">
+                                        <?= Yii::$app->formatter->asDatetime($r->created_at) ?>
+                                    </span>
+                                </div>
+                                <div class="comment-text"><?= nl2br(Html::encode($r->content)) ?></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
             </div>
         <?php endforeach; ?>
     <?php else: ?>
@@ -82,3 +128,16 @@ $this->registerCssFile('@web/css/post-view.css');
     <?php endif; ?>
 
 </section>
+
+<script>
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.reply-btn');
+        if (!btn) return;
+
+        const id = btn.getAttribute('data-reply');
+        const box = document.getElementById('reply-form-' + id);
+        if (!box) return;
+
+        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+    });
+</script>
