@@ -4,40 +4,37 @@ use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
 
 $this->title = 'Log In';
+$this->registerCssFile('@web/css/auth.css'); // CSS
 ?>
 
-<div class="auth-box">
-    <h2>Log In</h2>
+<div class="auth-page">
+    <div class="auth-box">
 
-    <?php 
-    // login form start
-    $form = ActiveForm::begin(); 
-    ?>
+        <h2>Log In</h2>
+        <p class="auth-subtitle">Welcome back. Please enter your details.</p>
 
-    <?=
-        // user email input
-        $form->field($model, 'email')->textInput()
-    ?>
-    <?=
-        // password input
-        $form->field($model, 'password')->passwordInput()
-    ?>
-    <?=
-        // checkbox
-        $form->field($model, 'rememberMe')->checkbox()
-    ?>
-    <?=
-        // submit button
-        Html::submitButton('Log In', ['class' => 'btn btn-primary'])
-    ?>
-    <?php 
-    // login form end
-    ActiveForm::end(); 
-    ?>
+        <?php $form = ActiveForm::begin(); ?>
 
-    <p>
-        Dont have account?
-        <a href="<?= \yii\helpers\Url::to(['auth/signup']) ?>">Sign Up</a>
-    </p>
+        <?= $form->field($model, 'email')
+            ->textInput(['placeholder' => 'Email']) ?>
 
+        <?= $form->field($model, 'password')
+            ->passwordInput(['placeholder' => 'Password']) ?>
+
+        <?= $form->field($model, 'rememberMe')->checkbox() ?>
+
+        <div class="auth-actions">
+            <?= Html::submitButton('Log In', ['class' => 'auth-btn']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+
+        <div class="auth-divider"></div>
+
+        <p class="auth-links">
+            Don’t have an account?
+            <a href="<?= \yii\helpers\Url::to(['auth/signup']) ?>">Sign Up</a>
+        </p>
+
+    </div>
 </div>

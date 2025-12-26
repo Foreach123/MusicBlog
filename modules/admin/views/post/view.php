@@ -41,7 +41,6 @@ $this->registerCssFile('@web/css/post-view.css');
 </article>
 
 <!-- COMMENTS -->
-<!-- COMMENTS -->
 <section class="comments" id="comments">
 
     <h2 class="comments-title">Comments</h2>

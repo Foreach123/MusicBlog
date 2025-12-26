@@ -10,7 +10,8 @@ use app\models\SignupForm;
 class AuthController extends Controller
 {
     // use main layout
-    public $layout = 'main';
+    public $layout = 'auth';
+    
 
     // login action
     public function actionLogin()
