@@ -30,11 +30,15 @@ class PostController extends Controller
     public function actionIndex()
     {
         $q = trim(Yii::$app->request->get('q', ''));
+        $cat = (int)Yii::$app->request->get('cat', 0);
 
         $query = Post::find()
             ->alias('p')
             ->where(['p.published' => 1])
             ->joinWith(['category c']);
+        if ($cat > 0) {
+            $query->andWhere(['p.category_id' => $cat]);
+        }
 
         if ($q !== '') {
             $tokens = preg_split('/\s+/', $q, -1, PREG_SPLIT_NO_EMPTY);
@@ -73,6 +77,7 @@ class PostController extends Controller
             'posts' => $posts,
             'pagination' => $pagination,
             'q' => $q,
+            'cat' => $cat,
         ]);
     }
 

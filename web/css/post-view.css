@@ -149,3 +149,43 @@
 .comment.reply {
     padding: 10px 0;
 }
+
+.share{
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.share-title{
+    color: rgba(255,255,255,.8);
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.share-link{
+    color: #ff2d87;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,45,135,.12);
+}
+
+.share-link:hover{
+    background: rgba(255,45,135,.22);
+}
+
+.share-copy{
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(20,24,30,.55);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.share-copy:hover{
+    border-color: rgba(255,45,135,.45);
+}

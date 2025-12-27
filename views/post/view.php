@@ -40,6 +40,56 @@ $this->registerCssFile('@web/css/music-posts.css');
 
 </article>
 
+<?php
+
+$postUrl = Url::to(['post/view', 'id' => $model->id], true); // absolute link
+$shareText = $model->title;
+?>
+<div class="share">
+    <div class="share-title">Share:</div>
+
+    <a class="share-link" target="_blank" rel="noopener"
+       href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($postUrl) ?>">
+        Facebook
+    </a>
+
+    <a class="share-link" target="_blank" rel="noopener"
+       href="https://twitter.com/intent/tweet?text=<?= urlencode($shareText) ?>&url=<?= urlencode($postUrl) ?>">
+        X
+    </a>
+
+    <a class="share-link" target="_blank" rel="noopener"
+       href="https://t.me/share/url?url=<?= urlencode($postUrl) ?>&text=<?= urlencode($shareText) ?>">
+        Telegram
+    </a>
+
+    <a class="share-link" target="_blank" rel="noopener"
+       href="viber://forward?text=<?= urlencode($shareText . ' ' . $postUrl) ?>">
+        Viber
+    </a>
+
+    <button class="share-copy" type="button" data-copy="<?= Html::encode($postUrl) ?>">
+        Copy link
+    </button>
+</div>
+
+<?php
+$this->registerJs(<<<JS
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.share-copy');
+  if (!btn) return;
+
+  const link = btn.getAttribute('data-copy');
+  if (!link) return;
+
+  navigator.clipboard.writeText(link).then(() => {
+    const old = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = old, 1200);
+  });
+});
+JS);
+?>
 <!-- COMMENTS -->
 <section class="comments" id="comments">
 

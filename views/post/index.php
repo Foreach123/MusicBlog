@@ -9,16 +9,41 @@ $this->registerCssFile('@web/css/music-posts.css'); // CSS
 
 <div class="posts-toolbar">
     <?= Html::beginForm(['post/index'], 'get', ['class' => 'search-form']) ?>
+    <?php if (!empty($cat)): ?>
+        <?= Html::hiddenInput('cat', $cat) ?>
+    <?php endif; ?>
+
     <?= Html::textInput('q', $q ?? '', [
         'class' => 'search-input',
         'placeholder' => 'Search'
     ]) ?>
     <?= Html::submitButton('Search', ['class' => 'search-btn']) ?>
     <?php if (!empty($q)): ?>
-        <a class="search-reset" href="<?= Url::to(['post/index']) ?>">Reset</a>
+        <a class="search-reset"
+            href="<?= Url::to(['post/index', 'cat' => $cat ?: null]) ?>">
+            Reset
+        </a>
     <?php endif; ?>
+
+    <?php if (!empty($cat)): ?>
+        <a class="search-reset"
+            href="<?= Url::to(['post/index']) ?>">
+            All categories
+        </a>
+    <?php endif; ?>
+
     <?= Html::endForm() ?>
 </div>
+
+<?php if (!empty($cat) && !empty($posts) && $posts[0]->category): ?>
+    <div class="active-filter">
+        Showing category: <b><?= Html::encode($posts[0]->category->name) ?></b>
+    </div>
+<?php elseif (!empty($cat) && empty($posts)): ?>
+    <div class="active-filter">
+        Showing category ID: <b><?= Html::encode($cat) ?></b>
+    </div>
+<?php endif; ?>
 
 
 <div class="posts-grid">
@@ -47,7 +72,14 @@ $this->registerCssFile('@web/css/music-posts.css'); // CSS
 
             <p class="music-category">
                 Category:
-                <?= Html::encode($post->category->name ?? 'No category') ?>
+                <?php if ($post->category): ?>
+                    <a class="category-link"
+                        href="<?= Url::to(['post/index', 'cat' => $post->category->id]) ?>">
+                        <?= Html::encode($post->category->name) ?>
+                    </a>
+                <?php else: ?>
+                    <span class="category-link muted">No category</span>
+                <?php endif; ?>
             </p>
 
             <p class="music-text">

@@ -246,3 +246,21 @@ body{
   border-color: rgba(255,0,102,.55);
   color:#fff;
 }
+
+.category-link{
+    color:#ff2d87;
+    text-decoration:none;
+    font-weight:600;
+}
+.category-link:hover{
+    text-decoration:underline;
+}
+.category-link.muted{
+    color:#888;
+    font-weight:400;
+}
+.active-filter{
+    text-align:center;
+    margin: 10px 0 18px;
+    color: rgba(255,255,255,.75);
+}
