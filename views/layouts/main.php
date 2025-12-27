@@ -2,6 +2,7 @@
 
 /** @var yii\web\View $this */
 /** @var string $content */
+$this->registerCssFile('@web/css/nav-bar.css'); // CSS
 
 use app\assets\AppAsset;
 use app\widgets\Alert;
@@ -9,6 +10,13 @@ use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
+
+$user = Yii::$app->user;
+/** @var \app\models\User|null $identity */
+$identity = $user->identity;
+
+$isAdmin = !$user->isGuest && $identity && $identity->isAdmin();
+
 
 AppAsset::register($this);
 
@@ -22,62 +30,68 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
+
 <head>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
+
 <body class="d-flex flex-column h-100">
-<?php $this->beginBody() ?>
+    <?php $this->beginBody() ?>
 
-<header id="header">
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->name . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
-    ]);
-    NavBar::end();
-    ?>
-</header>
+    <header id="header">
+        <?php
+        NavBar::begin([
+            'brandLabel' => Yii::$app->name,
+            'brandUrl' => Yii::$app->homeUrl,
+            'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
+        ]);
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav ms-auto'],
+            'encodeLabels' => false,
+            'items' => array_filter([
+                ['label' => 'Blog', 'url' => ['/post/index']],
 
-<main id="main" class="flex-shrink-0" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
-</main>
+                $isAdmin ? ['label' => 'Admin', 'url' => ['/admin/post/index']] : null,
+                $isAdmin ? ['label' => '+ New Post', 'url' => ['/admin/post/create']] : null,
 
-<footer id="footer" class="mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+                $user->isGuest
+                    ? ['label' => 'Login', 'url' => ['/auth/login']]
+                    : [
+                        'label' => 'Logout (' . Html::encode($identity->name ?? $identity->email) . ')',
+                        'url' => ['/auth/logout'],
+                        'linkOptions' => ['data-method' => 'post'],
+                    ],
+
+                $user->isGuest ? ['label' => 'Sign Up', 'url' => ['/auth/signup']] : null,
+            ]),
+        ]);
+
+        NavBar::end();
+        ?>
+    </header>
+
+    <main id="main" class="flex-shrink-0" role="main">
+        <div class="container">
+            <?php if (!empty($this->params['breadcrumbs'])): ?>
+                <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
+            <?php endif ?>
+            <?= Alert::widget() ?>
+            <?= $content ?>
         </div>
-    </div>
-</footer>
+    </main>
 
-<?php $this->endBody() ?>
+    <footer id="footer" class="mt-auto py-3 bg-light">
+        <div class="container">
+            <div class="row text-muted">
+                <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
+                <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+            </div>
+        </div>
+    </footer>
+
+    <?php $this->endBody() ?>
 </body>
+
 </html>
 <?php $this->endPage() ?>
