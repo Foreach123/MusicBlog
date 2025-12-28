@@ -79,14 +79,18 @@ class PostController extends Controller
             }
         }
 
+        $countQuery = (clone $query)
+            ->select('p.id')
+            ->distinct();
+
         $pagination = new Pagination([
             'defaultPageSize' => 6,
-            'totalCount' => $query->count(),
-            'params' => ['q' => $q, 'cat' => $cat],
+            'totalCount' => $countQuery->count(),
+            'params' => array_merge(Yii::$app->request->get(), ['q' => $q, 'cat' => $cat]),
         ]);
 
         $posts = $query
-            ->orderBy(['p.published_at' => SORT_DESC])
+            ->orderBy(['p.published_at' => SORT_DESC, 'p.id' => SORT_DESC])
             ->offset($pagination->offset)
             ->limit($pagination->limit)
             ->all();
