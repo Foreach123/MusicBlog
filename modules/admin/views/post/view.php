@@ -7,6 +7,7 @@ use yii\helpers\Url;
 /** @var app\models\Post $model */
 
 $this->registerCssFile('@web/css/post-view.css');
+$this->registerCssFile('@web/css/music-posts.css');
 ?>
 
 <article class="post-view">
