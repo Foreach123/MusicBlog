@@ -7,6 +7,26 @@ use yii\helpers\Url;
 $this->registerCssFile('@web/css/music-posts.css'); // CSS
 ?>
 
+<?php
+/** @var app\models\Category[] $categories */
+/** @var int $cat */
+/** @var string $q */
+?>
+
+<div class="cats-bar">
+    <a class="cat-chip <?= $cat === 0 ? 'active' : '' ?>"
+        href="<?= Url::to(['post/index', 'q' => $q]) ?>">
+        All
+    </a>
+
+    <?php foreach ($categories as $c): ?>
+        <a class="cat-chip <?= $cat === (int)$c->id ? 'active' : '' ?>"
+            href="<?= Url::to(['post/index', 'cat' => $c->id, 'q' => $q]) ?>">
+            <?= Html::encode($c->name) ?>
+        </a>
+    <?php endforeach; ?>
+</div>
+
 <div class="posts-toolbar">
     <?= Html::beginForm(['post/index'], 'get', ['class' => 'search-form']) ?>
     <?php if (!empty($cat)): ?>
@@ -19,10 +39,8 @@ $this->registerCssFile('@web/css/music-posts.css'); // CSS
     ]) ?>
     <?= Html::submitButton('Search', ['class' => 'search-btn']) ?>
     <?php if (!empty($q)): ?>
-        <a class="search-reset"
-            href="<?= Url::to(['post/index', 'cat' => $cat ?: null]) ?>">
-            Reset
-        </a>
+        <a class="search-reset" href="<?= Url::to(['post/index']) ?>">Reset</a>
+
     <?php endif; ?>
 
     <?php if (!empty($cat)): ?>
@@ -73,14 +91,14 @@ $this->registerCssFile('@web/css/music-posts.css'); // CSS
             <p class="music-category">
                 Category:
                 <?php if ($post->category): ?>
-                    <a class="category-link"
-                        href="<?= Url::to(['post/index', 'cat' => $post->category->id]) ?>">
+                    <a class="cat-link" href="<?= Url::to(['post/index', 'cat' => $post->category->id]) ?>">
                         <?= Html::encode($post->category->name) ?>
                     </a>
                 <?php else: ?>
-                    <span class="category-link muted">No category</span>
+                    No category
                 <?php endif; ?>
             </p>
+
 
             <p class="music-text">
                 <?= Html::encode($post->content) ?>

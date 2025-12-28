@@ -12,7 +12,7 @@ use yii\filters\AccessControl;
 use yii\db\Query;
 use yii\db\Expression;
 use app\models\Comment;
-use yii\web\Response;
+use app\models\Category;
 
 class PostController extends Controller
 {
@@ -32,10 +32,13 @@ class PostController extends Controller
         $q = trim(Yii::$app->request->get('q', ''));
         $cat = (int)Yii::$app->request->get('cat', 0);
 
+        $categories = Category::find()->orderBy(['name' => SORT_ASC])->all();
+
         $query = Post::find()
             ->alias('p')
             ->where(['p.published' => 1])
             ->joinWith(['category c']);
+
         if ($cat > 0) {
             $query->andWhere(['p.category_id' => $cat]);
         }
@@ -44,8 +47,6 @@ class PostController extends Controller
             $tokens = preg_split('/\s+/', $q, -1, PREG_SPLIT_NO_EMPTY);
 
             foreach ($tokens as $t) {
-
-
                 $tagExists = (new Query())
                     ->from(['pt' => 'post_tag'])
                     ->innerJoin(['tg' => 'tags'], 'tg.id = pt.tag_id')
@@ -65,6 +66,7 @@ class PostController extends Controller
         $pagination = new Pagination([
             'defaultPageSize' => 6,
             'totalCount' => $query->count(),
+            'params' => ['q' => $q, 'cat' => $cat],
         ]);
 
         $posts = $query
@@ -78,6 +80,7 @@ class PostController extends Controller
             'pagination' => $pagination,
             'q' => $q,
             'cat' => $cat,
+            'categories' => $categories,
         ]);
     }
 

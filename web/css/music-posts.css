@@ -264,3 +264,45 @@ body{
     margin: 10px 0 18px;
     color: rgba(255,255,255,.75);
 }
+
+.cats-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin: 6px 0 14px;
+}
+
+.cat-chip{
+    display:inline-flex;
+    align-items:center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(10,12,16,.45);
+    color: rgba(255,255,255,.78);
+    text-decoration:none;
+    font-size: 13px;
+    transition: .15s;
+}
+
+.cat-chip:hover{
+    transform: translateY(-1px);
+    border-color: rgba(255,45,135,.45);
+    color:#fff;
+}
+
+.cat-chip.active{
+    background: rgba(255,45,135,.18);
+    border-color: rgba(255,45,135,.55);
+    color:#fff;
+}
+
+.cat-link{
+    color:#ff2d87;
+    text-decoration:none;
+    font-weight:600;
+}
+.cat-link:hover{
+    text-decoration: underline;
+}
