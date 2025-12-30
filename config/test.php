@@ -53,6 +53,9 @@ return [
                 'auth/logout' => 'auth/logout',
             ],
         ],
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
+        ],
 
     ],
     'params' => $params,

@@ -3,97 +3,111 @@
 namespace tests\functional;
 
 use app\models\Post;
-use FunctionalTester;
+use app\models\Category;
 
 class PostCest
 {
-    public function _before(FunctionalTester $I)
-    {
-        // clean table before each test
-        Post::deleteAll();
+    private int $cat1Id;
+    private int $post1Id;
 
-        // create first test post
+
+    public function _before(\FunctionalTester $I)
+    {
+        Post::deleteAll();
+        Category::deleteAll();
+
+        $cat1 = new Category(['name' => 'Test Category 1']);
+        $cat1->save(false);
+        $this->cat1Id = (int)$cat1->id;
+
+        $cat2 = new Category(['name' => 'Test Category 2']);
+        $cat2->save(false);
+
         $post1 = new Post([
             'title' => 'Тестовий пост 1',
             'content' => 'Контент поста 1',
-            'category_id' => 1,
+            'category_id' => $cat1->id,
             'published' => 1,
         ]);
-        $post1->save();
+        $post1->save(false);
+        $this->post1Id = (int)$post1->id;
 
-        // create second test post
-        $post2 = new Post([
+
+        (new Post([
             'title' => 'Тестовий пост 2',
             'content' => 'Контент поста 2',
-            'category_id' => 2,
+            'category_id' => $cat2->id,
             'published' => 1,
-        ]);
-        $post2->save();
+        ]))->save(false);
     }
 
-    /**
-     * Test: page should load successfully
-     */
-    public function openPostsPage(FunctionalTester $I)
+    public function openPostsPage(\FunctionalTester $I)
     {
         $I->amOnPage('/post/index');
         $I->see('Smart music');
         $I->seeResponseCodeIs(200);
     }
 
-    /**
-     * Test: posts from DB should be visible
-     */
-    public function postsAreVisible(FunctionalTester $I)
+    public function postsAreVisible(\FunctionalTester $I)
     {
         $I->amOnPage('/post/index');
-
         $I->see('Тестовий пост 1');
         $I->see('Тестовий пост 2');
-
         $I->see('Контент поста 1');
         $I->see('Контент поста 2');
     }
 
-    /**
-     * Test: unpublished posts must not be shown
-     */
-    public function unpublishedPostHidden(FunctionalTester $I)
+    public function unpublishedPostHidden(\FunctionalTester $I)
     {
-        $post = new Post([
+        (new Post([
             'title' => 'Прихований пост',
             'content' => 'textxxx',
-            'category_id' => 1,
-            'published' => 0
-        ]);
-        $post->save();
+            'category_id' => $this->cat1Id,
+            'published' => 0,
+        ]))->save(false);
 
         $I->amOnPage('/post/index');
-
         $I->dontSee('Прихований пост');
     }
 
-    /**
-     * Test: pagination should work correctly
-     */
-    public function paginationWorks(FunctionalTester $I)
+    public function paginationWorks(\FunctionalTester $I)
     {
-        // generate many posts for pagination
         for ($i = 1; $i <= 15; $i++) {
-            $p = new Post([
+            (new Post([
                 'title' => 'Post ' . $i,
                 'content' => 'Lorem ipsum ' . $i,
-                'category_id' => 1,
+                'category_id' => $this->cat1Id,
                 'published' => 1,
-            ]);
-            $p->save();
+            ]))->save(false);
         }
 
         $I->amOnPage('/post/index');
+        $I->seeElement('.pagination');
 
-        $I->seeElement('.pagination'); // pagination is rendered
-
-        $I->click('2'); // go to next page
+        $I->click('2');
         $I->seeResponseCodeIs(200);
+    }
+
+    public function filterByCategoryWorks(\FunctionalTester $I)
+    {
+        $I->amOnPage('/post/index?cat=' . $this->cat1Id);
+        $I->see('Тестовий пост 1');
+        $I->dontSee('Тестовий пост 2');
+    }
+
+    public function searchByQueryWorks(\FunctionalTester $I)
+    {
+        $I->amOnPage('/post/index?q=пост+1');
+        $I->see('Тестовий пост 1');
+        $I->dontSee('Тестовий пост 2');
+    }
+
+    public function guestCannotSeeCommentForm(\FunctionalTester $I)
+    {
+        $I->amOnPage('/post/view?id=' . $this->post1Id);
+        $I->seeResponseCodeIs(200);
+
+        // form not shown for guest
+        $I->dontSeeElement('form[action*="add-comment"]');
     }
 }
