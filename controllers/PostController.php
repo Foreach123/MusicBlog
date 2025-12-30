@@ -19,6 +19,7 @@ class PostController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $model->user_id = Yii::$app->user->id;
         $newComment = new Comment();
         return $this->render('view', [
             'model' => $model,

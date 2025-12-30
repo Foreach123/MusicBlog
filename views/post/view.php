@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -20,9 +21,23 @@ $this->registerCssFile('@web/css/music-posts.css');
     <h1 class="post-title"><?= Html::encode($model->title) ?></h1>
 
     <div class="post-meta">
+        <span>
+            Author:
+            <?= Html::encode(
+                $model->author->name
+                    ?? $model->author->email
+                    ?? 'Unknown'
+            ) ?>
+        </span>
+
         <span>Category: <?= Html::encode($model->category->name ?? '—') ?></span>
-        <span>Published: <?= Yii::$app->formatter->asDate($model->published_at) ?></span>
+
+        <span>
+            Published:
+            <?= Yii::$app->formatter->asDate($model->published_at) ?>
+        </span>
     </div>
+
 
     <?php if ($model->tags): ?>
         <div class="post-tags">
@@ -49,22 +64,22 @@ $shareText = $model->title;
     <div class="share-title">Share:</div>
 
     <a class="share-link" target="_blank" rel="noopener"
-       href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($postUrl) ?>">
+        href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($postUrl) ?>">
         Facebook
     </a>
 
     <a class="share-link" target="_blank" rel="noopener"
-       href="https://twitter.com/intent/tweet?text=<?= urlencode($shareText) ?>&url=<?= urlencode($postUrl) ?>">
+        href="https://twitter.com/intent/tweet?text=<?= urlencode($shareText) ?>&url=<?= urlencode($postUrl) ?>">
         X
     </a>
 
     <a class="share-link" target="_blank" rel="noopener"
-       href="https://t.me/share/url?url=<?= urlencode($postUrl) ?>&text=<?= urlencode($shareText) ?>">
+        href="https://t.me/share/url?url=<?= urlencode($postUrl) ?>&text=<?= urlencode($shareText) ?>">
         Telegram
     </a>
 
     <a class="share-link" target="_blank" rel="noopener"
-       href="viber://forward?text=<?= urlencode($shareText . ' ' . $postUrl) ?>">
+        href="viber://forward?text=<?= urlencode($shareText . ' ' . $postUrl) ?>">
         Viber
     </a>
 

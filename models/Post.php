@@ -160,4 +160,9 @@ class Post extends ActiveRecord
             ])
             ->orderBy(['created_at' => SORT_ASC]);
     }
+
+    public function getAuthor()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
 }
