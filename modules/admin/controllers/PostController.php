@@ -13,6 +13,7 @@ use yii\db\Query;
 use yii\db\Expression;
 use app\models\Comment;
 use app\models\Category;
+use yii\web\ForbiddenHttpException;
 
 class PostController extends Controller
 {
@@ -94,13 +95,19 @@ class PostController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['add-comment'],
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'], // only logged in
+                        'roles' => ['@'],
+                        'matchCallback' => function () {
+                            return !Yii::$app->user->isGuest
+                                && Yii::$app->user->identity->role === 'admin';
+                        }
                     ],
                 ],
+                'denyCallback' => function () {
+                    throw new ForbiddenHttpException('Access denied');
+                }
             ],
         ];
     }
